@@ -1,0 +1,154 @@
+{
+  "info": {
+    "_postman_id": "5f9f6a3b-8f4c-4a1b-9a61-6b8a0d1c1c77",
+    "name": "Simplicode API",
+    "description": "Colección para probar el backend de Simplicode sin frontend.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Healthcheck",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Campo ok = true\", function () {",
+              "  var json = pm.response.json();",
+              "  pm.expect(json.ok).to.eql(true);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Interpretar (válido)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "name": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"ingresar x como entero con valor 10;\\nx -> x + 10 / 2\\nimprimir x\\n\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/interpretar",
+          "host": ["{{baseUrl}}"],
+          "path": ["interpretar"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test(\"Tiene campos esperados\", function () {",
+              "  pm.expect(json).to.have.property(\"consola\");",
+              "  pm.expect(json).to.have.property(\"errores\");",
+              "  pm.expect(json).to.have.property(\"simbolos\");",
+              "  pm.expect(json).to.have.property(\"ast\");",
+              "});",
+              "pm.test(\"Sin errores\", function () {",
+              "  pm.expect(Array.isArray(json.errores)).to.eql(true);",
+              "  pm.expect(json.errores.length).to.eql(0);",
+              "});",
+              "pm.test(\"Consola = 15\", function () {",
+              "  pm.expect(json.consola.trim()).to.eql(\"15\");",
+              "});",
+              "pm.test(\"Símbolos contiene x=15\", function () {",
+              "  const x = (json.simbolos || []).find(s => s.id === 'x');",
+              "  pm.expect(x).to.be.an('object');",
+              "  pm.expect(x.valor).to.eql(15);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Interpretar (error sintáctico)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "name": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"ingresar x como entero con valor 10\\nx -> \\nimprimir x\\n\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/interpretar",
+          "host": ["{{baseUrl}}"],
+          "path": ["interpretar"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 200 (retornamos 200 para mostrar errores)\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test(\"Tiene lista de errores\", function () {",
+              "  pm.expect(Array.isArray(json.errores)).to.eql(true);",
+              "  pm.expect(json.errores.length).to.be.greaterThan(0);",
+              "});",
+              "pm.test(\"Error Sintáctico con token y esperado\", function () {",
+              "  const e = json.errores[0];",
+              "  pm.expect(e.tipo).to.match(/Sintáctico|Léxico/);",
+              "  pm.expect(e.descripcion).to.be.a('string');",
+              "  // estos campos dependen de %locations y %error-verbose",
+              "  // si tu parser los expone, deberían venir llenos:",
+              "  // e.token, e.esperado, e.linea, e.columna, e.cercaDe",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001",
+      "type": "string"
+    }
+  ]
+}
