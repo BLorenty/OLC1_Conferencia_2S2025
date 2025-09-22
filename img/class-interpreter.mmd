@@ -1,0 +1,106 @@
+classDiagram
+  class Entorno {
+    +variables Map
+    +errores Array
+    +salida String
+    +declarar(id, tipo, valor, loc)
+    +asignar(id, valor, loc)
+    +obtener(id, loc) valor
+  }
+
+  class Nodo {
+    <<interface>>
+    +interpretar(entorno) any
+  }
+
+  class Numero {
+    -valor any
+    -loc any
+    +interpretar(entorno) any
+  }
+
+  class Cadena {
+    -valor String
+    -loc any
+    +interpretar(entorno) String
+  }
+
+  class Identificador {
+    -nombre String
+    -loc any
+    +interpretar(entorno) any
+  }
+
+  class Suma {
+    -izq Nodo
+    -der Nodo
+    -loc any
+    +interpretar(entorno) any
+  }
+
+  class Resta {
+    -izq Nodo
+    -der Nodo
+    -loc any
+    +interpretar(entorno) any
+  }
+
+  class Multiplicacion {
+    -izq Nodo
+    -der Nodo
+    -loc any
+    +interpretar(entorno) any
+  }
+
+  class Division {
+    -izq Nodo
+    -der Nodo
+    -loc any
+    +interpretar(entorno) any
+  }
+
+  class Declaracion {
+    -id String
+    -tipoDato String
+    -valor Nodo
+    -loc any
+    +interpretar(entorno) void
+  }
+
+  class Asignacion {
+    -id String
+    -valor Nodo
+    -loc any
+    +interpretar(entorno) void
+  }
+
+  class Imprimir {
+    -valor Nodo
+    -loc any
+    +interpretar(entorno) void
+  }
+
+  class Conversor {
+    +convertirNodo(nodoAst) Nodo
+  }
+
+  Nodo <|.. Numero
+  Nodo <|.. Cadena
+  Nodo <|.. Identificador
+  Nodo <|.. Suma
+  Nodo <|.. Resta
+  Nodo <|.. Multiplicacion
+  Nodo <|.. Division
+  Nodo <|.. Declaracion
+  Nodo <|.. Asignacion
+  Nodo <|.. Imprimir
+
+  Declaracion --> Nodo : valor
+  Asignacion --> Nodo : valor
+  Imprimir --> Nodo : valor
+
+  Conversor ..> Nodo : crea instancias
+  Identificador ..> Entorno : usa obtener
+  Declaracion ..> Entorno : usa declarar
+  Asignacion ..> Entorno : usa asignar
+  Imprimir ..> Entorno : escribe salida

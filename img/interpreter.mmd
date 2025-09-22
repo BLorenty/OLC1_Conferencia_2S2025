@@ -1,0 +1,22 @@
+flowchart LR
+  A[Código fuente] --> B[Parser]
+  B --> C[AST plano]
+  C --> D[Conversor AST a objetos]
+  D --> E[Árbol de clases del lenguaje]
+
+  subgraph Contexto
+    F[Entorno con variables, errores y salida]
+  end
+
+  E -->|interpretar| F
+  F --> H[Resultados: salida, símbolos y errores]
+
+  subgraph Clases
+    X1[Terminales: Numero, Cadena, Identificador]
+    X2[No terminales: Suma, Resta, Multiplicacion, Division]
+    X3[Instrucciones: Declaracion, Asignacion, Imprimir]
+  end
+
+  E --- X1
+  E --- X2
+  E --- X3

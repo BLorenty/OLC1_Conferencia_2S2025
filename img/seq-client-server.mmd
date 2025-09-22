@@ -1,0 +1,23 @@
+sequenceDiagram
+  autonumber
+  participant U as Usuario
+  participant C as Cliente React
+  participant V as Vite Proxy
+  participant S as Servidor Express
+  participant P as Parser Jison
+  participant I as Interprete
+  participant G as Generador DOT
+
+  U->>C: Clic en Ejecutar
+  C->>V: POST api interpretar con codigo
+  V->>S: POST interpretar con codigo
+  S->>P: parse codigo
+  P-->>S: AST
+  S->>I: interpretar AST
+  I-->>S: consola simbolos errores
+  S->>G: generar DOT desde AST
+  G-->>S: cadena DOT
+  S-->>V: JSON consola errores simbolos ast
+  V-->>C: JSON consola errores simbolos ast
+  C->>C: Render consola errores simbolos
+  C->>C: Render AST SVG con viz

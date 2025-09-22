@@ -1,0 +1,25 @@
+flowchart TD
+  subgraph Cliente
+    C1[Editor con textarea y botón Ejecutar]
+    C2[Solicitud axios POST a interpretar]
+    C3[Render consola, errores y símbolos]
+    C4[Render AST en SVG con viz]
+  end
+
+  subgraph Vite
+    P1[Proxy de /api hacia backend en localhost:3001]
+  end
+
+  subgraph Servidor
+    S1[POST interpretar]
+    S2[parser parse -> AST]
+    S3[Intérprete ejecuta AST]
+    S4[Generador AST a DOT]
+    S5[Respuesta JSON]
+  end
+
+  C1 --> C2 --> P1 --> S1
+  S1 --> S2 --> S3 --> S5
+  S2 --> S4 --> S5
+  S5 -->|JSON con consola, errores, símbolos, AST| C3
+  C3 --> C4
